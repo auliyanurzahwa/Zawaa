@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Liyzah Collection</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Poppins", Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            /* Gradient coklat-krem */
+            background: linear-gradient(135deg, #f5efe4, #e8d8c0, #c7a27c);
+            background-size: cover;
+        }
+
+        /* Glassmorphism */
+        .login-box {
+            width: 380px;
+            padding: 35px;
+            border-radius: 16px;
+            backdrop-filter: blur(10px); 
+            background: rgba(255, 255, 255, 0.55);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            text-align: center;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Logo Bulat */
+        .login-box img {
+            width: 95px;
+            height: 95px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #6b4f34;
+            margin-bottom: 12px;
+        }
+
+        h2 {
+            color: #5a3c28;
+            margin-bottom: 22px;
+            font-size: 24px;
+            letter-spacing: 1px;
+        }
+
+        .input-group {
+            text-align: left;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            font-size: 14px;
+            color: #5a3c28;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 6px;
+            border: 1px solid #b99c79;
+            border-radius: 10px;
+            background: #ffffffb3;
+            font-size: 15px;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #6b4f34;
+            box-shadow: 0 0 5px rgba(107, 79, 52, 0.5);
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            background: #6b4f34;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.3s;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #8a6b47;
+            transform: scale(1.02);
+        }
+
+        /* POPUP NOTIFIKASI */
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 25px 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+            text-align: center;
+            display: none;
+            animation: popupAnim 0.4s ease-out;
+        }
+
+        @keyframes popupAnim {
+            from { transform: translate(-50%, -60%); opacity: 0; }
+            to   { transform: translate(-50%, -50%); opacity: 1; }
+        }
+
+        .popup h3 {
+            color: #6b4f34;
+            margin-bottom: 10px;
+        }
+
+        /* LOADING SPINNER */
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 4px solid #ddd;
+            border-top: 4px solid #6b4f34;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 12px auto 0;
+            display: none;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+ 
+<body>
+
+    <div class="login-box">
+        <img src="image/liyzah collection.jpg" alt="Logo Liyzah Collection">
+        <h2>Login to Liyzah Collection</h2>
+
+        <form onsubmit="event.preventDefault(); loginNow();">
+            
+            <div class="input-group">
+                <label>Email</label>
+                <input id="email" type="email" placeholder="Enter your email" required>
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <input id="password" type="password" placeholder="Enter your password" required>
+            </div>
+
+            <button type="submit">Login</button>
+        </form>
+   
+    </div>
+
+    <!-- POPUP SUKSES -->
+    <div class="popup" id="popupSuccess">
+        <h3>Login Berhasil!</h3>
+        <p>Anda akan diarahkan ke halaman utama...</p>
+        <div class="spinner" id="spinner"></div>
+    </div>
+
+    <script>
+        function loginNow() {
+            const popup = document.getElementById("popupSuccess");
+            const spinner = document.getElementById("spinner");
+
+            popup.style.display = "block";      // Tampilkan popup sukses
+            spinner.style.display = "block";    // Tampilkan loading spinner
+
+            setTimeout(() => {
+                window.location.href = "index.html"; // Pindah halaman
+            }, 2500);
+        }
+    </script>
+
+<script>
+    // Fungsi login
+    function loginNow() {
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
+
+        // Contoh validasi sederhana, bisa disesuaikan
+        const defaultEmail = "auliyanurzahwa6@gmail.com";
+        const defaultPass = "Seventeen17";
+
+        if(email === defaultEmail && password === defaultPass) {
+            // Simpan status login
+            localStorage.setItem("isLoggedIn", "true");
+            // Tandai bahwa logout sebelumnya
+            if(localStorage.getItem("logged_out")) {
+                localStorage.removeItem("orders"); // hapus My Orders
+                localStorage.removeItem("logged_out");
+            }
+
+            // Tampilkan popup
+            const popup = document.getElementById("popupSuccess");
+            const spinner = document.getElementById("spinner");
+            popup.style.display = "block";
+            spinner.style.display = "block";
+
+            setTimeout(() => {
+                window.location.href = "index.html"; // pindah halaman
+            }, 2500);
+        } else {
+            alert("Email atau password salah!");
+        }
+    }
+
+    // Cek status login jika user membuka login.html lagi
+    window.onload = function() {
+        if(localStorage.getItem("isLoggedIn") === "true") {
+            window.location.href = "index.html";
+        }
+    }
+</script>
+
+</body>
+</html>

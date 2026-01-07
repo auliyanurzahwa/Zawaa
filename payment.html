@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Payment - Liyzah Collection</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#F5EDE3;
+}
+.navbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px 40px;
+    background:#8B5E3C;
+    color:white;
+}
+.nav-menu a{
+    color:white;
+    text-decoration:none;
+    margin-left:25px;
+}
+.container{
+    max-width:1000px;
+    margin:40px auto;
+    background:white;
+    padding:30px;
+    border-radius:16px;
+    box-shadow:0 5px 12px rgba(0,0,0,.1);
+}
+h2{color:#5C3A21;}
+table{width:100%;border-collapse:collapse;}
+th,td{padding:12px;border-bottom:1px solid #ddd;}
+th{background:#F0E4D7;}
+.total{text-align:right;font-size:18px;font-weight:bold;margin-top:20px;}
+.checkout{text-align:right;margin-top:30px;}
+button{
+    background:#8B5E3C;
+    color:white;
+    border:none;
+    padding:12px 30px;
+    border-radius:25px;
+    cursor:pointer;
+}
+input,textarea,select{
+    width:100%;
+    padding:10px;
+    margin:8px 0 15px;
+    border-radius:10px;
+    border:1px solid #ccc;
+}
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <strong>Liyzah Collection</strong>
+    <div class="nav-menu">
+        <a href="index.html">Home</a>
+        <a href="produk.html">Products</a>
+        <a href="payment.html">Payment</a>
+    </div>
+</div>
+
+<div class="container">
+    <h2>Order Summary</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Color</th>
+                <th>Size</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody id="order-list"></tbody>
+    </table>
+
+    <div class="total">
+        Total: <span id="grand-total">Rp 0</span>
+    </div>
+</div>
+
+<div class="container">
+    <h2>Shipping & Payment Details</h2>
+
+    <label>Full Name</label>
+    <input type="text" id="name">
+
+    <label>Phone Number</label>
+    <input type="text" id="phone">
+
+    <label>Shipping Address</label>
+    <textarea id="address"></textarea>
+
+    <label>Shipping Method</label>
+    <select id="shipping">
+        <option value="0">-- Select Shipping --</option>
+        <option value="20000">Regular (Rp 20.000)</option>
+        <option value="40000">Express (Rp 40.000)</option>
+    </select>
+
+    <label>Payment Method</label>
+    <input type="radio" name="pay" value="Bank Transfer"> Bank Transfer<br>
+    <input type="radio" name="pay" value="E-Wallet"> E-Wallet<br>
+    <input type="radio" name="pay" value="COD"> COD
+
+    <div class="total">
+        Shipping: <span id="shipping-cost">Rp 0</span><br>
+        Final Total: <span id="final-total">Rp 0</span>
+    </div>
+
+    <div class="checkout">
+        <button onclick="processPayment()">Pay Now</button>
+    </div>
+</div>
+
+<script>
+/* ===== KODE ASLI ===== */
+const orderList = document.getElementById("order-list");
+const grandTotalEl = document.getElementById("grand-total");
+
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let grandTotal = 0;
+
+if(cart.length === 0){
+    orderList.innerHTML = `<tr><td colspan="6">No product selected</td></tr>`;
+}else{
+    cart.forEach(item=>{
+        const subtotal = item.price * item.qty;
+        grandTotal += subtotal;
+        orderList.innerHTML += `
+        <tr>
+            <td>${item.name}</td>
+            <td>${item.color}</td>
+            <td>${item.size}</td>
+            <td>${item.qty}</td>
+            <td>Rp ${item.price.toLocaleString()}</td>
+            <td>Rp ${subtotal.toLocaleString()}</td>
+        </tr>`;
+    });
+}
+grandTotalEl.innerText = "Rp " + grandTotal.toLocaleString();
+
+const shippingSelect = document.getElementById("shipping");
+const shippingCostEl = document.getElementById("shipping-cost");
+const finalTotalEl = document.getElementById("final-total");
+
+shippingSelect.addEventListener("change",()=>{
+    const ship = Number(shippingSelect.value);
+    shippingCostEl.innerText = "Rp " + ship.toLocaleString();
+    finalTotalEl.innerText = "Rp " + (grandTotal + ship).toLocaleString();
+});
+
+/* ===== TAMBAHAN TANPA MENGUBAH KODE ASLI ===== */
+function processPayment(){
+    const payment = document.querySelector('input[name="pay"]:checked');
+    if(!payment || shippingSelect.value == 0){
+        alert("Lengkapi data pembayaran!");
+        return;
+    }
+
+    const orders = JSON.parse(localStorage.getItem("orders")) || [];
+    orders.push({
+        id: "ORD" + Date.now(),
+        item: cart.map(i=>i.name).join(", "),
+        total: "Rp " + (grandTotal + Number(shippingSelect.value)).toLocaleString(),
+        payment: payment.value,
+        status: "Diproses"
+    });
+
+    localStorage.setItem("orders", JSON.stringify(orders));
+    localStorage.removeItem("cart");
+
+    alert("Payment Successful!");
+    window.location.href = "user.html";
+}
+</script>
+
+</body>
+</html>

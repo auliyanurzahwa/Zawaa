@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>User Profile - Liyzah Collection</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #F5EDE3;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            background: #8B5E3C;
+            color: white;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+        }
+
+        .profile-container {
+            max-width: 1000px;
+            margin: 50px auto;
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+        }
+
+        .profile-top {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .profile-avatar {
+            flex: 1;
+            text-align: center;
+        }
+
+        .profile-avatar img {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+
+        .upload-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: #8B5E3C;
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .profile-details {
+            flex: 2;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 12px;
+            color: #6D4C2F;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        .save-btn {
+            margin-top: 20px;
+            padding: 12px 25px;
+            background: #8B5E3C;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+        }
+
+        .save-btn:hover {
+            background: #734A2F;
+        }
+
+        /* MY ORDERS */
+        .orders {
+            margin-top: 50px;
+        }
+
+        .orders h2 {
+            color: #5C3A21;
+            margin-bottom: 15px;
+        }
+
+        .order-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            background: #FAFAFA;
+        }
+
+        .status {
+            float: right;
+            font-weight: bold;
+            color: green;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 30px;
+            color: #8B5E3C;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            margin-left: 20px;
+            padding: 8px 16px;
+            background: #C44536;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <strong>Liyzah Collection</strong>
+    <div>
+        <a href="index.html">Home</a>
+        <a href="produk.html">Produk</a>
+        <a href="user.html">Profile</a>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+</div>
+
+<div class="profile-container">
+
+    <!-- PROFILE -->
+    <div class="profile-top">
+        <div class="profile-avatar">
+            <img id="avatarPreview" src="https://cdn-icons-png.flaticon.com/512/456/456212.png">
+            <br>
+            <label class="upload-btn">
+                Upload Foto
+                <input type="file" id="avatarUpload" accept="image/*" hidden>
+            </label>
+        </div>
+
+        <div class="profile-details">
+            <h2>Informasi Pengguna</h2>
+
+            <label>Nama Lengkap</label>
+            <input type="text" id="name">
+
+            <label>Email</label>
+            <input type="email" id="email">
+
+            <label>No. Telepon</label>
+            <input type="text" id="phone">
+
+            <label>Alamat</label>
+            <textarea id="address" rows="3"></textarea>
+
+            <button class="save-btn" onclick="saveProfile()">Simpan Profil</button>
+        </div>
+    </div>
+
+    <!-- MY ORDERS -->
+    <div class="orders">
+        <h2>My Orders</h2>
+        <div id="orderList"></div>
+    </div>
+
+    <a href="index.html" class="back-btn">← Kembali ke Home</a>
+
+</div>
+
+<script>
+    const avatarPreview = document.getElementById("avatarPreview");
+    const avatarUpload = document.getElementById("avatarUpload");
+
+    // LOAD PROFILE
+    window.onload = function () {
+        // Jika sebelumnya logout, hapus semua orders
+        if (localStorage.getItem("logged_out")) {
+            localStorage.removeItem("orders"); 
+            localStorage.removeItem("logged_out"); // reset flag
+        }
+
+        name.value = localStorage.getItem("user_name") || "";
+        email.value = localStorage.getItem("user_email") || "";
+        phone.value = localStorage.getItem("user_phone") || "";
+        address.value = localStorage.getItem("user_address") || "";
+
+        const savedAvatar = localStorage.getItem("user_avatar");
+        if (savedAvatar) {
+            avatarPreview.src = savedAvatar;
+        }
+
+        loadOrders();
+    };
+
+    // UPLOAD FOTO
+    avatarUpload.addEventListener("change", function () {
+        const file = this.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function () {
+            avatarPreview.src = reader.result;
+            localStorage.setItem("user_avatar", reader.result);
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // SAVE PROFILE
+    function saveProfile() {
+        localStorage.setItem("user_name", name.value);
+        localStorage.setItem("user_email", email.value);
+        localStorage.setItem("user_phone", phone.value);
+        localStorage.setItem("user_address", address.value);
+
+        alert("Profil berhasil disimpan");
+    }
+
+    // LOAD ORDERS
+    function loadOrders() {
+        const orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+        const orderList = document.getElementById("orderList");
+        orderList.innerHTML = "";
+
+        if (orders.length === 0) {
+            orderList.innerHTML = "<p>Belum ada pesanan.</p>";
+            return;
+        }
+
+        orders.forEach(order => {
+            orderList.innerHTML += `
+                <div class="order-card">
+                    <span class="status">${order.status}</span>
+                    <strong>${order.id}</strong><br>
+                    Produk: ${order.item}<br>
+                    Total: ${order.total}<br>
+                    Metode: ${order.payment}
+                </div>
+            `;
+        });
+    }
+
+    // LOGOUT FUNCTION - hapus My Orders otomatis saat login berikutnya
+    function logout() {
+        localStorage.setItem("logged_out", "true"); // set flag logout
+        alert("Logout berhasil!");
+        window.location.href = "login.html"; // arahkan ke halaman login
+    }
+</script>
+
+</body>
+</html>

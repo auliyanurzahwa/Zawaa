@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cart - Liyzah Collection</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{font-family:Arial; background:#F5EDE3; margin:0; padding:0;}
+.container{max-width:800px; margin:50px auto; background:white; padding:20px; border-radius:12px;}
+h1{text-align:center; color:#5C3A21;}
+table{width:100%; border-collapse:collapse; margin-top:20px;}
+th,td{padding:10px; text-align:center; border-bottom:1px solid #ddd;}
+th{background:#8B5E3C; color:white;}
+button{padding:5px 12px; border:none; border-radius:8px; background:#8B5E3C; color:white; cursor:pointer;}
+button:hover{background:#734A2F;}
+.total{font-weight:bold; text-align:right; margin-top:15px;}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>Your Cart</h1>
+
+<table>
+<thead>
+<tr>
+<th>Product</th>
+<th>Price</th>
+<th>Qty</th>
+<th>Subtotal</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="cart-body"></tbody>
+</table>
+
+<div class="total" id="cart-total"></div>
+<button onclick="checkout()">Checkout</button>
+</div>
+
+<script>
+/* ================= KODE ASLI (TIDAK DIUBAH) ================= */
+const productDetails = JSON.parse(localStorage.getItem('productDetails')) || {
+    "pashmina-premium": {name:"Pashmina Premium", price:85000},
+    "square-hijab-soft": {name:"Square Hijab Soft", price:75000},
+    "voal-exclusive": {name:"Voal Exclusive", price:95000},
+    "premium-series": {name:"Premium Series", price:120000},
+    "voal-hijab-light": {name:"Voal Hijab Light", price:90000},
+    "square-hijab-satin": {name:"Square Hijab Satin", price:80000},
+    "pashmina-soft": {name:"Pashmina Soft", price:70000},
+    "voal-exclusive-premium": {name:"Voal Exclusive Premium", price:105000}
+};
+
+function loadCart(){
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const tbody = document.getElementById('cart-body');
+    tbody.innerHTML = '';
+    let total = 0;
+
+    cart.forEach(item => {
+        const product = productDetails[item.key];
+        const subtotal = product.price * item.qty;
+        total += subtotal;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${product.name}</td>
+            <td>Rp ${product.price.toLocaleString()}</td>
+            <td>${item.qty}</td>
+            <td>Rp ${subtotal.toLocaleString()}</td>
+            <td><button onclick="removeItem('${item.key}')">Remove</button></td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    document.getElementById('cart-total').textContent =
+        "Total: Rp " + total.toLocaleString();
+}
+
+function removeItem(key){
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    cart = cart.filter(item => item.key !== key);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    loadCart();
+}
+
+function checkout(){
+    alert('Thank you for your purchase!');
+    localStorage.removeItem('cart');
+    loadCart();
+}
+
+loadCart();
+/* ================= END KODE ASLI ================= */
+
+
+/* ============================================================
+   TAMBAHAN KODE (TANPA MENGUBAH KODE ASLI)
+   Override checkout → redirect ke payment.html
+============================================================ */
+checkout = function(){
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    if(cart.length === 0){
+        alert("Your cart is empty!");
+        return;
+    }
+    window.location.href = "payment.html";
+};
+</script>
+
+</body>
+</html>
